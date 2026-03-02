@@ -3,264 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steel Center Product - Boshqaruv Paneli</title>
+    <title>STEEL CENTER PRODUCT - Professional System</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    
     <style>
-        :root { --primary: #2c3e50; --secondary: #34495e; --accent: #e67e22; --text: #ecf0f1; --success: #27ae60; --danger: #e74c3c; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #f4f7f6; display: flex; }
+        :root { --p: #1a202c; --s: #2d3748; --acc: #f6ad55; --txt: #edf2f7; --bg: #f7fafc; --brdr: #e2e8f0; --green: #38a169; --red: #e53e3e; }
+        body { font-family: 'Inter', system-ui, sans-serif; margin: 0; background: var(--bg); display: flex; color: var(--p); }
         
         /* Sidebar */
-        .sidebar { width: 250px; background: var(--primary); height: 100vh; color: white; position: fixed; padding-top: 20px; }
-        .sidebar h2 { text-align: center; font-size: 18px; border-bottom: 1px solid var(--secondary); padding-bottom: 20px; }
-        .sidebar nav a { display: block; padding: 15px 25px; color: var(--text); text-decoration: none; transition: 0.3s; cursor: pointer; }
-        .sidebar nav a:hover { background: var(--accent); }
-        
-        /* Main Content */
-        .main-content { margin-left: 250px; padding: 20px; width: calc(100% - 250px); }
-        .section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h3 { color: var(--primary); border-left: 5px solid var(--accent); padding-left: 10px; }
+        .sidebar { width: 280px; background: var(--p); height: 100vh; color: white; position: fixed; display: flex; flex-direction: column; box-shadow: 4px 0 10px rgba(0,0,0,0.1); }
+        .sidebar-header { padding: 25px; background: #2d3748; text-align: center; border-bottom: 2px solid var(--acc); }
+        .sidebar-header h2 { margin: 0; font-size: 18px; letter-spacing: 1px; color: var(--acc); }
+        nav { flex: 1; padding: 15px 0; }
+        nav a { display: block; padding: 12px 25px; color: #cbd5e0; text-decoration: none; transition: 0.2s; cursor: pointer; border-left: 4px solid transparent; margin-bottom: 4px; }
+        nav a:hover, nav a.active { background: #4a5568; color: white; border-left-color: var(--acc); }
+        .btn-close-day { background: var(--red); margin: 20px; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-close-day:hover { background: #c53030; transform: translateY(-2px); }
 
-        /* Form styling */
-        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 15px; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 4px; outline: none; }
-        button { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; transition: 0.3s; font-weight: bold; }
-        .btn-add { background: var(--success); color: white; }
-        .btn-export { background: var(--primary); color: white; margin-right: 5px; }
-        
-        /* Table styling */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-        table th, table td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-        table th { background: var(--secondary); color: white; }
-        .num-format { font-family: 'Courier New', Courier, monospace; font-weight: bold; }
-        
+        /* Main Content */
+        .main { margin-left: 280px; padding: 35px; width: 100%; max-width: 1400px; }
+        .card { background: white; padding: 25px; border-radius: 12px; shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--brdr); margin-bottom: 25px; }
+        h3 { margin-top: 0; font-size: 20px; border-bottom: 2px solid var(--bg); padding-bottom: 10px; color: var(--s); display: flex; justify-content: space-between; }
+
+        /* Forms */
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        input, select { padding: 12px; border: 1px solid var(--brdr); border-radius: 6px; font-size: 14px; outline: none; transition: 0.2s; }
+        input:focus { border-color: var(--acc); box-shadow: 0 0 0 2px rgba(246, 173, 85, 0.2); }
+        .btn-save { background: var(--green); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn-save:hover { opacity: 0.9; }
+
+        /* Tables */
+        .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--brdr); }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 13px; text-transform: uppercase; color: #718096; border-bottom: 2px solid var(--brdr); }
+        td { padding: 15px; border-bottom: 1px solid var(--brdr); font-size: 14px; }
+        .num-cell { font-family: 'Monaco', monospace; font-weight: bold; color: #2d3748; }
+
+        /* Status & Labels */
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-income { background: #c6f6d5; color: #22543d; }
+        .badge-expense { background: #fed7d7; color: #822727; }
+
         .hidden { display: none; }
+        .sum-box { font-size: 24px; color: var(--green); font-weight: 800; }
     </style>
 </head>
 <body>
-
 <div class="sidebar">
-    <h2>STEEL CENTER PRODUCT</h2>
+    <div class="sidebar-header"><h2>STEEL CENTER</h2></div>
     <nav>
-        <a onclick="showSection('ombor')">📦 Ombor & Astatka</a>
-        <a onclick="showSection('savdo')">💰 Sotilgan Mahsulotlar</a>
-        <a onclick="showSection('nasiya')">📝 Nasiyalar & Qarzlar</a>
-        <a onclick="showSection('xarajat')">📉 Xarajatlar</a>
-        <a onclick="showSection('ishchilar')">👥 Ishchilar Oyligi</a>
-        <a onclick="archiveDay()" style="background: var(--danger); margin-top: 20px;">🔒 Kunni Yopish (Arxiv)</a>
+        <a onclick="route('ombor')" id="m-ombor" class="active">📦 Ombor & Astatka</a>
+        <a onclick="route('savdo')" id="m-savdo">💰 Sotilgan Mahsulotlar</a>
+        <a onclick="route('nasiya')" id="m-nasiya">🤝 Nasiyalar (Mijoz)</a>
+        <a onclick="route('qarz')" id="m-qarz">💸 Qarzlar (Bizniki)</a>
+        <a onclick="route('xarajat')" id="m-xarajat">📉 Xarajatlar</a>
+        <a onclick="route('ishchilar')" id="m-ishchilar">👥 Ishchilar Oyligi</a>
+        <a onclick="route('arxiv')" id="m-arxiv">📚 Arxivlar</a>
     </nav>
+    <div class="btn-close-day" onclick="closeDay()">🔒 KUNNI YOPISH</div>
 </div>
 
-<div class="main-content">
-    <div id="ombor" class="section">
-        <h3>Ombor va Yangi Mahsulotlar</h3>
-        <div class="grid-inputs">
+<div class="main">
+    
+    <div id="sec-ombor" class="card">
+        <h3>Ombor Astatkasi <span id="ombor-total-val" class="sum-box">0 $</span></h3>
+        <div class="form-row">
             <input type="text" id="p_nomi" placeholder="Mahsulot nomi">
             <input type="number" id="p_vazni" placeholder="Vazni (kg)">
-            <input type="number" id="p_narxi" placeholder="Narxi ($)">
+            <input type="number" id="p_narxi" placeholder="Tannarxi ($)">
             <input type="number" id="p_kira" placeholder="Yo'l kirasi ($)">
-            <button class="btn-add" onclick="addData('ombor')">Qo'shish</button>
+            <button class="btn-save" onclick="addOmbor()">Qo'shish</button>
         </div>
-        <table id="table-ombor">
-            <thead>
-                <tr>
-                    <th>Nomi</th>
-                    <th>Vazni</th>
-                    <th>Narxi (Dona)</th>
-                    <th>Yo'l kirasi</th>
-                    <th>Umumiy Summa</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-<div id="savdo" class="section hidden">
-        <h3>Sotilgan Mahsulotlar</h3>
-        <div class="grid-inputs">
-            <select id="s_nomi"><option value="">Mahsulotni tanlang</option></select>
-            <input type="number" id="s_vazni" placeholder="Sotilgan vazni">
-            <input type="number" id="s_sotuv_narxi" placeholder="Sotuv narxi">
-            <input type="text" id="s_sotuvchi" placeholder="Kim sotdi?">
-            <button class="btn-add" onclick="addData('savdo')">Sotish</button>
+        <div class="table-wrap">
+            <table id="tbl-ombor">
+                <thead><tr><th>Nomi</th><th>Vazni (kg)</th><th>Tannarx ($)</th><th>Yo'l kira</th><th>Jami Qiymat</th></tr></thead>
+                <tbody></tbody>
+            </table>
         </div>
-        <table id="table-savdo">
-            <thead>
-                <tr>
-                    <th>Nomi</th>
-                    <th>Vazni</th>
-                    <th>Tannarxi</th>
-                    <th>Sotilgan narxi</th>
-                    <th>Foyda</th>
-                    <th>Sotuvchi</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
     </div>
 
-    <div id="nasiya" class="section hidden">
-        <h3>Nasiyalar va Qarzlar</h3>
-        <div class="grid-inputs">
-            <input type="text" id="n_kimga" placeholder="Kimga / Kimdan">
-            <input type="text" id="n_nima" placeholder="Nima uchun">
-            <input type="number" id="n_summa" placeholder="Summa">
-            <input type="date" id="n_sana" placeholder="Qaytarish sanasi">
+    <div id="sec-savdo" class="card hidden">
+        <h3>Sotilgan Mahsulotlar <span id="savdo-total-val" class="sum-box">0 $</span></h3>
+        <div class="form-row">
+            <select id="s_select"><option value="">Mahsulotni tanlang</option></select>
+            <input type="number" id="s_vazni" placeholder="Sotuv vazni">
+            <input type="number" id="s_narxi" placeholder="Sotuv narxi ($)">
+            <input type="text" id="s_kim" placeholder="Sotuvchi">
+            <button class="btn-save" onclick="addSavdo()">Sotuvni Qayd Etish</button>
+        </div>
+        <div class="table-wrap">
+            <table id="tbl-savdo">
+                <thead><tr><th>Nomi</th><th>Vazni</th><th>Tannarx</th><th>Sotuv Narxi</th><th>Jami Savdo</th><th>Foyda</th><th>Mas'ul</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="sec-nasiya" class="card hidden">
+        <h3>Nasiyalar (Mijozlardan olinadigan)</h3>
+        <div class="form-row">
+            <input type="text" id="n_ism" placeholder="Mijoz ismi">
+            <input type="number" id="n_vazn" placeholder="Vazni">
+            <input type="number" id="n_pul" placeholder="Summa">
+            <input type="date" id="n_sana">
             <input type="text" id="n_tel" placeholder="Telefon">
-            <button class="btn-add" onclick="addData('nasiya')">Saqlash</button>
+            <button class="btn-save" onclick="saveTo('nasiya')">Nasiyani Yozish</button>
         </div>
-        <table id="table-nasiya">
-            <thead>
-                <tr>
-                    <th>Ism</th>
-                    <th>Nima</th>
-                    <th>Summa</th>
-                    <th>Muddat</th>
-                    <th>Tel</th>
-                </tr>
-            </thead>
+        <table id="tbl-nasiya">
+            <thead><tr><th>Mijoz</th><th>Vazni</th><th>Summa</th><th>Sana</th><th>Tel</th><th>Amal</th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
 
-    <div id="xarajat" class="section hidden">
-        <h3>Xarajatlar</h3>
-        <div class="grid-inputs">
-            <input type="text" id="x_nima" placeholder="Nima uchun">
-            <input type="number" id="x_summa" placeholder="Summa">
-            <input type="text" id="x_kim" placeholder="Kim orqali">
-            <button class="btn-add" onclick="addData('xarajat')">Qo'shish</button>
+    <div id="sec-qarz" class="card hidden">
+        <h3>Qarzlar (Bizning qarzimiz)</h3>
+        <div class="form-row">
+            <input type="text" id="q_kimdan" placeholder="Kimdan olindi">
+            <input type="text" id="q_nima" placeholder="Nima uchun">
+            <input type="number" id="q_pul" placeholder="Summa">
+            <input type="date" id="q_sana">
+            <button class="btn-save" onclick="saveTo('qarz')">Qarzni Yozish</button>
         </div>
-        <table id="table-xarajat">
-            <thead><tr><th>Maqsadi</th><th>Summa</th><th>Mas'ul</th></tr></thead>
+        <table id="tbl-qarz">
+            <thead><tr><th>Kimdan</th><th>Maqsad</th><th>Summa</th><th>Muddati</th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
-
-    <div id="ishchilar" class="section hidden">
-        <h3>Ishchilar Oyligi (Kunlik hisob)</h3>
-        <div class="grid-inputs">
+<div id="sec-ishchilar" class="card hidden">
+        <h3>Ishchilar Oylik Hisobi</h3>
+        <div class="form-row">
             <input type="text" id="i_ism" placeholder="Ishchi ismi">
             <input type="number" id="i_jami" placeholder="Umumiy oyligi">
             <input type="number" id="i_bugun" placeholder="Bugun olgan puli">
-            <button class="btn-add" onclick="addData('ishchilar')">Saqlash</button>
+            <button class="btn-save" onclick="saveTo('ishchilar')">Saqlash</button>
         </div>
-        <table id="table-ishchilar">
-            <thead><tr><th>Ism</th><th>Jami oylik</th><th>Bugun oldi</th><th>Qoldi</th></tr></thead>
+        <table id="tbl-ishchilar">
+            <thead><tr><th>Ism</th><th>Jami Oylik</th><th>Bugun Oldi</th><th>Qolgan Qarz</th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
 
-    <div style="text-align: right; margin-top: 20px;">
-        <button class="btn-export" onclick="exportToExcel()">Excel yuklash</button>
-        <button class="btn-export" style="background: #c0392b;" onclick="exportToPDF()">PDF yuklash</button>
+    <div id="sec-xarajat" class="card hidden">
+        <h3>Xarajatlar</h3>
+        <div class="form-row">
+            <input type="text" id="x_nima" placeholder="Nima xarajat">
+            <input type="number" id="x_pul" placeholder="Summa">
+            <input type="text" id="x_kim" placeholder="Kim orqali">
+            <button class="btn-save" onclick="saveTo('xarajat')">Qo'shish</button>
+        </div>
+        <table id="tbl-xarajat">
+            <thead><tr><th>Maqsad</th><th>Summa</th><th>Mas'ul</th></tr></thead>
+            <tbody></tbody>
+        </table>
     </div>
+
+    <div id="sec-arxiv" class="card hidden">
+        <h3>Yopilgan Kunlar Arvixi</h3>
+        <div id="arxiv-list"></div>
+    </div>
+
 </div>
 
 <script>
-    // Raqamlarni 1,000 ko'rinishida formatlash
-    const fNum = (num) => new Intl.NumberFormat('uz-UZ').format(num);
+    // MA'LUMOTLAR OMBORI (Local Storage bilan ishlash)
+    let state = JSON.parse(localStorage.getItem('steel_current')) || {
+        ombor: [], savdo: [], nasiya: [], qarz: [], xarajat: [], ishchilar: []
+    };
 
-    function showSection(id) {
-        document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-        if(id === 'savdo') updateProductDropdown();
+    const fmt = (n) => new Intl.NumberFormat('uz-UZ').format(n);
+
+    function route(id) {
+        document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+        document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+        document.getElementById('sec-' + id).classList.remove('hidden');
+        document.getElementById('m-' + id).classList.add('active');
+        if(id === 'savdo') syncDropdown();
+        if(id === 'arxiv') renderArxiv();
+        renderAll();
     }
 
-    let db = { ombor: [], savdo: [], nasiya: [], xarajat: [], ishchilar: [] };
-function addData(type) {
-        if (type === 'ombor') {
-            let item = {
-                nomi: document.getElementById('p_nomi').value,
-                vazni: parseFloat(document.getElementById('p_vazni').value),
-                narxi: parseFloat(document.getElementById('p_narxi').value),
-                kira: parseFloat(document.getElementById('p_kira').value)
-            };
-            db.ombor.push(item);
-            renderTable('ombor', ['nomi', 'vazni', 'narxi', 'kira', (i) => fNum((i.vazni * i.narxi) + i.kira)]);
-        } 
-        else if (type === 'savdo') {
-            let pIdx = document.getElementById('s_nomi').value;
-            let product = db.ombor[pIdx];
-            let sotilganVazn = parseFloat(document.getElementById('s_vazni').value);
-            let sotuvNarxi = parseFloat(document.getElementById('s_sotuv_narxi').value);
-
-            if(product.vazni >= sotilganVazn) {
-                let foyda = (sotuvNarxi - product.narxi) * sotilganVazn;
-                db.savdo.push({
-                    nomi: product.nomi,
-                    vazni: sotilganVazn,
-                    tannarxi: product.narxi,
-                    sotilgan: sotuvNarxi,
-                    foyda: foyda,
-                    kim: document.getElementById('s_sotuvchi').value
-                });
-                product.vazni -= sotilganVazn; // Ombordan ayirish
-                renderTable('savdo', ['nomi', 'vazni', 'tannarxi', 'sotilgan', 'foyda', 'kim']);
-                renderTable('ombor', ['nomi', 'vazni', 'narxi', 'kira', (i) => fNum((i.vazni * i.narxi) + i.kira)]);
-            } else { alert("Omborda yetarli mahsulot yo'q!"); }
-        }
-        else if (type === 'xarajat') {
-            db.xarajat.push({ nima: document.getElementById('x_nima').value, summa: document.getElementById('x_summa').value, kim: document.getElementById('x_kim').value });
-            renderTable('xarajat', ['nima', 'summa', 'kim']);
-        }
-        else if (type === 'ishchilar') {
-            let jami = parseFloat(document.getElementById('i_jami').value);
-            let bugun = parseFloat(document.getElementById('i_bugun').value);
-            db.ishchilar.push({ ism: document.getElementById('i_ism').value, jami: jami, bugun: bugun, qoldi: jami - bugun });
-            renderTable('ishchilar', ['ism', 'jami', 'bugun', 'qoldi']);
-        }
-        else if (type === 'nasiya') {
-            db.nasiya.push({ ism: document.getElementById('n_kimga').value, nima: document.getElementById('n_nima').value, summa: document.getElementById('n_summa').value, sana: document.getElementById('n_sana').value, tel: document.getElementById('n_tel').value });
-            renderTable('nasiya', ['ism', 'nima', 'summa', 'sana', 'tel']);
-        }
-    }
-
-    function renderTable(type, keys) {
-        let tbody = document.querySelector(`#table-${type} tbody`);
-        tbody.innerHTML = '';
-        db[type].forEach((item, idx) => {
-            let tr = document.createElement('tr');
-            keys.forEach(key => {
-                let td = document.createElement('td');
-                if (typeof key === 'function') td.innerText = key(item);
-                else td.innerText = isNaN(item[key]) ? item[key] : fNum(item[key]);
-                tr.appendChild(td);
-            });
-            tbody.appendChild(tr);
+    function syncDropdown() {
+        const sel = document.getElementById('s_select');
+        sel.innerHTML = '<option value="">Tanlang...</option>';
+        state.ombor.forEach((p, i) => {
+            if(p.vazni > 0) sel.innerHTML += <option value="${i}">${p.nomi} (${p.vazni} kg)</option>;
         });
     }
 
-    function updateProductDropdown() {
-        let select = document.getElementById('s_nomi');
-        select.innerHTML = '<option value="">Tanlang</option>';
-        db.ombor.forEach((p, idx) => {
-            if(p.vazni > 0) select.innerHTML += <option value="${idx}">${p.nomi} (${p.vazni} kg qoldi)</option>;
+    function addOmbor() {
+        const p = {
+            nomi: document.getElementById('p_nomi').value,
+            vazni: parseFloat(document.getElementById('p_vazni').value) || 0,
+            narxi: parseFloat(document.getElementById('p_narxi').value) || 0,
+            kira: parseFloat(document.getElementById('p_kira').value) || 0
+        };
+        if(!p.nomi) return alert("Nomini yozing");
+        state.ombor.push(p);
+        saveState();
+    }
+
+    function addSavdo() {
+        const idx = document.getElementById('s_select').value;
+        const v = parseFloat(document.getElementById('s_vazni').value);
+        const n = parseFloat(document.getElementById('s_narxi').value);
+        if(idx === ""  !v  !n) return alert("Ma'lumot to'liq emas");
+
+        const product = state.ombor[idx];
+        if(product.vazni < v) return alert("Omborda buncha yuk yo'q!");
+
+        const jami = v * n;
+        const foyda = (n - product.narxi) * v;
+        
+        state.savdo.push({
+            nomi: product.nomi, vazni: v, tan: product.narxi, 
+            sotuv: n, jami: jami, foyda: foyda, kim: document.getElementById('s_kim').value
+        });
+        
+        product.vazni -= v;
+        saveState();
+        syncDropdown();
+    }
+function saveTo(type) {
+        let obj = {};
+        if(type === 'nasiya') obj = { ism: document.getElementById('n_ism').value, vazn: document.getElementById('n_vazn').value, pul: document.getElementById('n_pul').value, sana: document.getElementById('n_sana').value, tel: document.getElementById('n_tel').value };
+        if(type === 'qarz') obj = { kimdan: document.getElementById('q_kimdan').value, nima: document.getElementById('q_nima').value, pul: document.getElementById('q_pul').value, sana: document.getElementById('q_sana').value };
+        if(type === 'xarajat') obj = { nima: document.getElementById('x_nima').value, pul: document.getElementById('x_pul').value, kim: document.getElementById('x_kim').value };
+        if(type === 'ishchilar') {
+            let j = parseFloat(document.getElementById('i_jami').value);
+            let b = parseFloat(document.getElementById('i_bugun').value);
+            obj = { ism: document.getElementById('i_ism').value, jami: j, bugun: b, qoldi: j - b };
+        }
+        state[type].push(obj);
+        saveState();
+    }
+
+    function removeNasiya(idx) {
+        const item = state.nasiya[idx];
+        // Nasiya yopilganda umumiy kirimga qo'shish logikasi (ixtiyoriy)
+        state.nasiya.splice(idx, 1);
+        saveState();
+    }
+
+    function saveState() {
+        localStorage.setItem('steel_current', JSON.stringify(state));
+        renderAll();
+    }
+
+    function renderAll() {
+        // Ombor Render
+        const bOmbor = document.querySelector('#tbl-ombor tbody');
+        bOmbor.innerHTML = '';
+        let totalOmbor = 0;
+        state.ombor.forEach(i => {
+            let sum = (i.vazni * i.narxi) + i.kira;
+            totalOmbor += sum;
+            bOmbor.innerHTML += <tr><td>${i.nomi}</td><td class="num-cell">${fmt(i.vazni)}</td><td class="num-cell">${fmt(i.narxi)}</td><td class="num-cell">${fmt(i.kira)}</td><td class="num-cell">${fmt(sum)} $</td></tr>;
+        });
+        document.getElementById('ombor-total-val').innerText = fmt(totalOmbor) + " $";
+
+        // Savdo Render
+        const bSavdo = document.querySelector('#tbl-savdo tbody');
+        bSavdo.innerHTML = '';
+        let totalSavdo = 0;
+        state.savdo.forEach(i => {
+            totalSavdo += i.jami;
+            bSavdo.innerHTML += <tr><td>${i.nomi}</td><td>${i.vazni}</td><td>${fmt(i.tan)}</td><td>${fmt(i.sotuv)}</td><td class="num-cell">${fmt(i.jami)}</td><td style="color:green;font-weight:bold">${fmt(i.foyda)}</td><td>${i.kim}</td></tr>;
+        });
+        document.getElementById('savdo-total-val').innerText = fmt(totalSavdo) + " $";
+
+        // Boshqa jadvallar uchun sodda render
+        renderSimple('nasiya', ['ism','vazn','pul','sana','tel'], true);
+        renderSimple('qarz', ['kimdan','nima','pul','sana']);
+        renderSimple('xarajat', ['nima','pul','kim']);
+        renderSimple('ishchilar', ['ism','jami','bugun','qoldi']);
+    }
+
+    function renderSimple(type, keys, hasDelete = false) {
+        const b = document.querySelector(`#tbl-${type} tbody`);
+        b.innerHTML = '';
+        state[type].forEach((item, idx) => {
+            let tr = '<tr>';
+            keys.forEach(k => tr += `<td class="num-cell">${isNaN(item[k]) ? item[k] : fmt(item[k])}</td>`);
+            if(hasDelete) tr += <td><button onclick="removeNasiya(${idx})" style="background:var(--acc);border:none;border-radius:4px;cursor:pointer">Yopish</button></td>;
+            b.innerHTML += tr + '</tr>';
         });
     }
 
-    function archiveDay() {
-        const report = JSON.stringify(db);
-        localStorage.setItem('archive_' + new Date().toLocaleDateString(), report);
-        alert("Kunlik ma'lumotlar arxivlandi!");
+    function closeDay() {
+        if(!confirm("Bugungi ish kunini yopib, arxivga saqlamoqchimisiz?")) return;
+        let archives = JSON.parse(localStorage.getItem('steel_archives')) || [];
+        archives.push({
+            date: new Date().toLocaleString('uz-UZ'),
+            data: state
+        });
+        localStorage.setItem('steel_archives', JSON.stringify(archives));
+        
+        // Tozalash
+        state = { ombor: state.ombor, savdo: [], nasiya: state.nasiya, qarz: state.qarz, xarajat: [], ishchilar: [] };
+        saveState();
+        alert("Kun yopildi! Ma'lumotlar arxivga o'tdi.");
     }
-function exportToExcel() {
-        let wb = XLSX.utils.book_new();
-        Object.keys(db).forEach(key => {
-            let ws = XLSX.utils.json_to_sheet(db[key]);
+function renderArxiv() {
+        const div = document.getElementById('arxiv-list');
+        const archives = JSON.parse(localStorage.getItem('steel_archives')) || [];
+        div.innerHTML = archives.length ? '' : 'Hozircha arxiv yo‘q.';
+        archives.reverse().forEach((a, i) => {
+            div.innerHTML += `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border:1px solid var(--brdr); margin-bottom:10px; border-radius:8px">
+                    <span><b>📅 ${a.date}</b></span>
+                    <div>
+                        <button onclick="exportExcel(${archives.length - 1 - i})" style="background:var(--s); color:white; padding:8px">Excel</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function exportExcel(idx) {
+        const archives = JSON.parse(localStorage.getItem('steel_archives'));
+        const data = archives[idx].data;
+        const wb = XLSX.utils.book_new();
+        Object.keys(data).forEach(key => {
+            const ws = XLSX.utils.json_to_sheet(data[key]);
             XLSX.utils.book_append_sheet(wb, ws, key);
         });
-        XLSX.writeFile(wb, "Steel_Center_Hisobot.xlsx");
+        XLSX.writeFile(wb, `Steel_Report_${archives[idx].date}.xlsx`);
     }
 
-    async function exportToPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("STEEL CENTER PRODUCT - KUNLIK HISOBOT", 10, 10);
-        doc.autoTable({ html: '#table-savdo' });
-        doc.save("Hisobot.pdf");
-    }
+    // Ilk yuklanishda render
+    renderAll();
 </script>
-
 </body>
 </html>
