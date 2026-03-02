@@ -51,6 +51,7 @@
     </style>
 </head>
 <body>
+
 <div class="sidebar">
     <div class="sidebar-header"><h2>STEEL CENTER</h2></div>
     <nav>
@@ -131,7 +132,8 @@
             <tbody></tbody>
         </table>
     </div>
-<div id="sec-ishchilar" class="card hidden">
+
+    <div id="sec-ishchilar" class="card hidden">
         <h3>Ishchilar Oylik Hisobi</h3>
         <div class="form-row">
             <input type="text" id="i_ism" placeholder="Ishchi ismi">
@@ -188,7 +190,7 @@
         const sel = document.getElementById('s_select');
         sel.innerHTML = '<option value="">Tanlang...</option>';
         state.ombor.forEach((p, i) => {
-            if(p.vazni > 0) sel.innerHTML += <option value="${i}">${p.nomi} (${p.vazni} kg)</option>;
+            if(p.vazni > 0) sel.innerHTML += `<option value="${i}">${p.nomi} (${p.vazni} kg)</option>`;
         });
     }
 
@@ -208,7 +210,7 @@
         const idx = document.getElementById('s_select').value;
         const v = parseFloat(document.getElementById('s_vazni').value);
         const n = parseFloat(document.getElementById('s_narxi').value);
-        if(idx === ""  !v  !n) return alert("Ma'lumot to'liq emas");
+        if(idx === "" || !v || !n) return alert("Ma'lumot to'liq emas");
 
         const product = state.ombor[idx];
         if(product.vazni < v) return alert("Omborda buncha yuk yo'q!");
@@ -225,7 +227,8 @@
         saveState();
         syncDropdown();
     }
-function saveTo(type) {
+
+    function saveTo(type) {
         let obj = {};
         if(type === 'nasiya') obj = { ism: document.getElementById('n_ism').value, vazn: document.getElementById('n_vazn').value, pul: document.getElementById('n_pul').value, sana: document.getElementById('n_sana').value, tel: document.getElementById('n_tel').value };
         if(type === 'qarz') obj = { kimdan: document.getElementById('q_kimdan').value, nima: document.getElementById('q_nima').value, pul: document.getElementById('q_pul').value, sana: document.getElementById('q_sana').value };
@@ -259,7 +262,7 @@ function saveTo(type) {
         state.ombor.forEach(i => {
             let sum = (i.vazni * i.narxi) + i.kira;
             totalOmbor += sum;
-            bOmbor.innerHTML += <tr><td>${i.nomi}</td><td class="num-cell">${fmt(i.vazni)}</td><td class="num-cell">${fmt(i.narxi)}</td><td class="num-cell">${fmt(i.kira)}</td><td class="num-cell">${fmt(sum)} $</td></tr>;
+            bOmbor.innerHTML += `<tr><td>${i.nomi}</td><td class="num-cell">${fmt(i.vazni)}</td><td class="num-cell">${fmt(i.narxi)}</td><td class="num-cell">${fmt(i.kira)}</td><td class="num-cell">${fmt(sum)} $</td></tr>`;
         });
         document.getElementById('ombor-total-val').innerText = fmt(totalOmbor) + " $";
 
@@ -269,7 +272,7 @@ function saveTo(type) {
         let totalSavdo = 0;
         state.savdo.forEach(i => {
             totalSavdo += i.jami;
-            bSavdo.innerHTML += <tr><td>${i.nomi}</td><td>${i.vazni}</td><td>${fmt(i.tan)}</td><td>${fmt(i.sotuv)}</td><td class="num-cell">${fmt(i.jami)}</td><td style="color:green;font-weight:bold">${fmt(i.foyda)}</td><td>${i.kim}</td></tr>;
+            bSavdo.innerHTML += `<tr><td>${i.nomi}</td><td>${i.vazni}</td><td>${fmt(i.tan)}</td><td>${fmt(i.sotuv)}</td><td class="num-cell">${fmt(i.jami)}</td><td style="color:green;font-weight:bold">${fmt(i.foyda)}</td><td>${i.kim}</td></tr>`;
         });
         document.getElementById('savdo-total-val').innerText = fmt(totalSavdo) + " $";
 
@@ -286,7 +289,7 @@ function saveTo(type) {
         state[type].forEach((item, idx) => {
             let tr = '<tr>';
             keys.forEach(k => tr += `<td class="num-cell">${isNaN(item[k]) ? item[k] : fmt(item[k])}</td>`);
-            if(hasDelete) tr += <td><button onclick="removeNasiya(${idx})" style="background:var(--acc);border:none;border-radius:4px;cursor:pointer">Yopish</button></td>;
+            if(hasDelete) tr += `<td><button onclick="removeNasiya(${idx})" style="background:var(--acc);border:none;border-radius:4px;cursor:pointer">Yopish</button></td>`;
             b.innerHTML += tr + '</tr>';
         });
     }
@@ -305,7 +308,8 @@ function saveTo(type) {
         saveState();
         alert("Kun yopildi! Ma'lumotlar arxivga o'tdi.");
     }
-function renderArxiv() {
+
+    function renderArxiv() {
         const div = document.getElementById('arxiv-list');
         const archives = JSON.parse(localStorage.getItem('steel_archives')) || [];
         div.innerHTML = archives.length ? '' : 'Hozircha arxiv yo‘q.';
